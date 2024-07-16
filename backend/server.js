@@ -4,9 +4,10 @@ import dotenv from "dotenv"
 import cookieParser from "cookie-parser";
 
 
-import authRoutes from "./routes/auth.routes.js"
-import usershRoutes from "./routes/user.routes.js"
-import postshRoutes from "./routes/post.routes.js"
+import authRoutes from "./routes/auth.route.js"
+import usersRoutes from "./routes/user.route.js"
+import postsRoutes from "./routes/post.route.js"
+import notificationsRoutes from "./routes/notification.route.js"
 import connetMongoDB from "./db/connectToMongo.js";
 
 dotenv.config()
@@ -23,8 +24,9 @@ app.use(express.urlencoded({extended:true})) // to accepte the urlencoded type
 app.use(cookieParser())
 
 app.use("/api/auth",authRoutes)
-app.use("/api/users",usershRoutes)
-app.use("/api/posts",postshRoutes)
+app.use("/api/users",usersRoutes)
+app.use("/api/posts",postsRoutes)
+app.use("/api/notifications",notificationsRoutes)
 
 
 app.listen(PORT,()=>{

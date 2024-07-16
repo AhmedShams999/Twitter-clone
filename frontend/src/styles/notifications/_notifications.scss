@@ -1,0 +1,73 @@
+@use "../utils" as u;
+
+.notifications{
+  flex: 4 4 0;
+  border-right: 1px solid gray;
+  min-height: 100vh;
+  &__header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom:1px solid gray;
+    & p {
+      font-weight: bold;
+    }
+    &__dropdown{
+      position: relative;
+      &__btn{
+        color: white;
+        cursor: pointer;
+      }
+      &__content{
+        padding: 1rem;
+        position: absolute;
+        left: 0;
+        background-color: black;
+        border-radius:5px ;
+        z-index: 50;
+        &:hover{
+          background-color: u.$gray;
+        }
+        cursor: pointer;
+        & li{
+          color: white;
+          width: 10rem;
+        }
+      }
+
+    }
+    
+  }
+  &__notification{
+    color: white;
+    border-bottom: 1px solid gray;
+    &__container{
+      display: flex;
+      gap: 0.5rem;
+      padding: 1rem;
+      &__followIcon{
+        width: 25px;
+        height: 25px;
+        color: u.$primary;
+      }
+      &__likeIcon{
+        width: 25px;
+        height: 25px;
+        color: u.$error-red;
+      }
+      &__avater{
+        width: 40px;
+        border-radius: 50px;
+        margin-bottom: 5px;
+      }
+      &__userInfo{
+        display: flex;
+        gap: 0.25rem;
+        & span{
+          font-weight: bold;
+        }
+      }
+    }
+  }
+}
