@@ -1,9 +1,9 @@
 import React from 'react'
 
-const LoadingSpinner = ({ size = "md" }) => {
-	const sizeClass = `loading-${size}`;
+const LoadingSpinner = () => {
+	// const sizeClass = `loading-${size}`;
 
-	return <span className={`loading loading-spinner ${sizeClass}`} />;
+	return <div id="spinner"></div>
 };
 
 export default LoadingSpinner

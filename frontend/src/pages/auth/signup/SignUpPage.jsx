@@ -7,25 +7,53 @@ import { MdPassword } from "react-icons/md";
 import { MdDriveFileRenameOutline } from "react-icons/md";
 import {Link} from "react-router-dom"
 
+import {useMutation} from "@tanstack/react-query"
+
+import {toast} from "react-hot-toast"
+
+
 function SignUpPage() {
   const [formData, setFormData] = useState({
 		email: "",
 		username: "",
-		fullName: "",
+		fullname: "",
 		password: "",
 	});
 
+  const {mutate,isError,isPending,error} = useMutation({
+    mutationFn: async({username,fullname,password,email})=>{
+      try {
+        const res = await fetch("/api/auth/signup",{
+          method: "POST",
+          headers:{
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({username,fullname,password,email})
+        })
+        const data = await res.json()
+        if(!res.ok) throw new Error(data.error || "Failed to create an account")
+        return data;
+      } catch (error) {
+        // console.error(error)
+        throw error
+      }
+    },
+    onSuccess: ()=>{
+      toast.success("Account created successfully")
+    }
+  })
+
 	const handleSubmit = (e) => {
 		e.preventDefault();
-		console.log(formData);
+		mutate(formData)
 	};
 
 	const handleInputChange = (e) => {
 		setFormData({ ...formData, [e.target.name]: e.target.value });
 	};
 
-  const isPending = false;
-	const isError = false;
+
+
 
   return (
     <div className='container'>
@@ -62,9 +90,9 @@ function SignUpPage() {
                   <input 
                     type="text"   
                     placeholder='Full Name'
-                    name='fullName'
+                    name='fullname'
                     onChange={handleInputChange}
-                    value={formData.fullName}
+                    value={formData.fullname}
                     />
               </label>
               <label >
@@ -80,7 +108,7 @@ function SignUpPage() {
               <button>
                 {isPending ? "Loading..." : "Sign up"}
               </button>
-              {/* {isError && <p className='error'>{error.message}</p>} */}
+              {isError && <p className='error'>{error.message}</p>}
             </div>
         </form>
         <div className='container__form-container__signin'>

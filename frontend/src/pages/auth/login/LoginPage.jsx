@@ -3,19 +3,45 @@ import { FaUser } from 'react-icons/fa';
 import { MdPassword } from 'react-icons/md';
 import XSvg from '../../../components/svgs/X';
 import { Link } from 'react-router-dom';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
 
 function LoginPage() {
   const [formData, setFormData] = useState({
 		username: "",
 		password: "",
 	});
+  const queryClient = useQueryClient()
+  const {mutate:loginMutation,isError,isPending,error} = useMutation({
+    mutationFn: async({username,password})=>{
+      try {
+        const res = await fetch("/api/auth/login",{
+          method: "POST",
+          headers:{
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({username,password})
+        })
+        const data = await res.json()
+        if(!res.ok) throw new Error(data.error || "Something went wrong")
 
-  const isPending = false;
-  const isError = false;
+
+      } catch (error) {
+        throw new Error(error)
+      }
+    },
+    onSuccess:()=>{
+      // refetch authUser query
+      queryClient.invalidateQueries({queryKey:["authUser"]})
+    },
+    retry: false,
+  
+  })
+
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
-		console.log(formData);
+		loginMutation(formData)
 	};
 
 	const handleInputChange = (e) => {
@@ -53,7 +79,7 @@ function LoginPage() {
             <button>
               {isPending ? "Loading..." : "Login"}
             </button>
-            {/* {isError && <p className='error'>{error.message}</p>} */}
+            {isError && <p className='error'>{error.message}</p>}
           </div>
       </form>
       <div className='loginContainer__form-container__login'>
@@ -63,7 +89,7 @@ function LoginPage() {
         </Link>
       </div>
     </div>
-</div>
+ </div>
   )
 }
 
