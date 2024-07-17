@@ -35,7 +35,7 @@ const Post = ({ post }) => {
 				<div className='post__content'>
 					<div className='post__content__userInfo'>
 						<Link to={`/profile/${postOwner.username}`} className='post__content__userInfo__fullName link'>
-							{postOwner.fullName}
+							{postOwner.fullname}
 						</Link>
 						<span className='post__content__userInfo__userName'>
 							<Link className="link" to={`/profile/${postOwner.username}`}>@{postOwner.username}</Link>

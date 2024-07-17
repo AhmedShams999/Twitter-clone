@@ -10,7 +10,9 @@
   &__avatar{
     width: 40px;
     height: 40px;
+    border-radius: 50%;
     & img{
+      border-radius: 50%;
       width: 100%;
     }
   }
@@ -22,7 +24,7 @@
       display: flex;
       gap: 0.5rem;
       align-items: center;
-      margin-bottom: 0.25rem;
+      margin-bottom: 0.5rem;
       &__fullName{
         font-weight: bold;
       }
