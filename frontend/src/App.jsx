@@ -35,7 +35,7 @@ function App() {
   if(isLoading){
     return(
       <div className='loaderContainer'>
-        <LoadingSpinner />
+        <LoadingSpinner size={"lg"}/>
       </div>
     )
   }
