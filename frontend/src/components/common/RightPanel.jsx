@@ -2,9 +2,34 @@ import React from 'react'
 import RightPanelSkeleton from '../skeletons/RightPanelSkeleton';
 import { Link } from 'react-router-dom';
 import { USERS_FOR_RIGHT_PANEL } from "../../utils/db/dummy";
+import { useQuery } from '@tanstack/react-query';
 
 function RightPanel() {
-  const isLoading = false;
+  const {data:suggestedUsers,isLoading}= useQuery({
+    queryKey:["suggestedUsers"],
+    queryFn: async()=>{
+      try {
+        const res = await fetch("/api/users/suggests")
+
+        const data = await res.json()
+
+        if(!res.ok) throw new Error(data.error || "Something went wrong!")
+
+        return data;
+         
+      } catch (error) {
+        throw new Error(error)
+      }
+    }
+  })
+
+  if(suggestedUsers?.length === 0) return (
+    <div className='right-panel-empty'>
+
+    </div>
+  )
+
+
   return (
   <div className='right-panel'>
       <div className='right-panel__container'>
@@ -20,7 +45,7 @@ function RightPanel() {
             </>
           )}
           {!isLoading &&
-            USERS_FOR_RIGHT_PANEL?.map((user) => (
+            suggestedUsers?.map((user) => (
               <Link
                 to={`/profile/${user.username}`}
                 className='right-panel__container__users__user link'
@@ -31,7 +56,7 @@ function RightPanel() {
                  
                   <div>
                       <p>
-                          {user.fullName}
+                          {user.fullname}
                       </p>
                       <p>
                         @{user.username}
