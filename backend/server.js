@@ -19,7 +19,8 @@ cloudinary.config({
 
 const app = express(); 
 const PORT = process.env.PORT || 5000
-app.use(express.json()) // to parse requests
+app.use(express.json({limit:"5mb"})) // to parse requests
+// limit the uploaded pictures to 5mb but not TO LARGE as there some kind of attacks called DoS
 app.use(express.urlencoded({extended:true})) // to accepte the urlencoded type 
 app.use(cookieParser())
 
