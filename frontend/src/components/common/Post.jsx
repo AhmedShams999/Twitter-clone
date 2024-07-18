@@ -10,12 +10,13 @@ import toast from "react-hot-toast";
 
 import LoadingSpinner from "../common/LoadingSpinner.jsx"
 
+
 const Post = ({ post }) => {
 	const [comment, setComment] = useState("");
 	const {data:authUser} = useQuery({queryKey:["authUser"]})
 	const queryClient = useQueryClient()
 
-	const {mutate:deletePost,isPending} = useMutation({
+	const {mutate:deletePost,isPending:deletePending} = useMutation({
 		mutationFn: async()=>{
 			try {
 				const res = await fetch(`api/posts/${post._id}`,{
@@ -35,8 +36,43 @@ const Post = ({ post }) => {
 		}
 	})
 
+	const {mutate:likeUnlikePost,isPending:likeUnlikePending} = useMutation({
+		mutationFn: async()=>{
+				try {
+					const res = await fetch(`/api/posts/like/${post._id}`,{
+						method: "POST",
+					})
+					const data = await res.json()
+
+					if(!res.ok) throw new Error(data.error || "Something went wrong!")
+
+					return data
+
+				} catch (error) {
+					throw new Error(error)
+				}
+		},
+		onSuccess: (updatedLikes)=>{
+			// toast.success("Post is liked")
+			// is not the most optimal Solution for the UI/UX because it refetch all the posts
+			// queryClient.invalidateQueries({queryKey:["posts"]})
+			// instead, upfate the cache directly for that post
+			queryClient.setQueryData(["posts"],(oldData)=>{
+				return oldData.map(p =>{
+					if(p._id === post._id)
+						return {...p,likes:updatedLikes}
+					else
+					 return p
+				})
+			})
+		},
+		onError: ()=>{
+			toast.error("Something went wrong!")
+		}
+	})
+
 	const postOwner = post.user;
-	const isLiked = false;
+	const isLiked = post.likes.includes(authUser._id);
 
 	const isMyPost = authUser._id === postOwner._id;
 
@@ -52,7 +88,10 @@ const Post = ({ post }) => {
 		e.preventDefault();
 	};
 
-	const handleLikePost = () => {};
+	const handleLikePost = () => {
+		if(likeUnlikePending) return
+		likeUnlikePost()
+	};
 
 	return (
 		<>
@@ -73,11 +112,11 @@ const Post = ({ post }) => {
 						</span>
 						{isMyPost && (
 							<span className='post__content__userInfo__trashIcon'>
-								{!isPending &&(
+								{!deletePending &&(
 									<FaTrash onClick={handleDeletePost} className="post__content__userInfo__trashIcon__icon"/>
 								)
 								}
-								{isPending && (
+								{deletePending && (
 									<LoadingSpinner  size={"sm"}/>
 								)}
 							</span>
@@ -144,7 +183,7 @@ const Post = ({ post }) => {
 										/>
 										<button className='post__content__postInfo__firstPart__showComments__section__addComment__btn'>
 											{isCommenting ? (
-												<span className='loader'></span>
+												<LoadingSpinner size={"sm"} />
 											) : (
 												"Post"
 											)}
@@ -160,11 +199,11 @@ const Post = ({ post }) => {
 								<span className=''>0</span>
 							</div>
 							<div className='post__content__postInfo__firstPart__likes' onClick={handleLikePost}>
-								{!isLiked && (
+								{!isLiked && !likeUnlikePending && (
 									<FaRegHeart className='post__content__postInfo__firstPart__likes__icon' />
 								)}
-								{isLiked && <FaRegHeart className='post__content__postInfo__firstPart__likes__icon active' />}
-
+								{isLiked && !likeUnlikePending && <FaRegHeart className='post__content__postInfo__firstPart__likes__icon active' />}
+								{likeUnlikePending && <LoadingSpinner size={"sm"}/>}
 								<span
 									className={`post__content__postInfo__firstPart__likes ${
 										isLiked ? "isLiked" : ""
