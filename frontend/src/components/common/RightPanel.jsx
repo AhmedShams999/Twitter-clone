@@ -3,6 +3,8 @@ import RightPanelSkeleton from '../skeletons/RightPanelSkeleton';
 import { Link } from 'react-router-dom';
 import { USERS_FOR_RIGHT_PANEL } from "../../utils/db/dummy";
 import { useQuery } from '@tanstack/react-query';
+import useFollow from '../../hooks/useFollow';
+import LoadingSpinner from './LoadingSpinner';
 
 function RightPanel() {
   const {data:suggestedUsers,isLoading}= useQuery({
@@ -22,6 +24,9 @@ function RightPanel() {
       }
     }
   })
+
+
+  const {followUnfollow,isPending} = useFollow()
 
   if(suggestedUsers?.length === 0) return (
     <div className='right-panel-empty'>
@@ -65,9 +70,12 @@ function RightPanel() {
                   
                 </div>
                 <button
-                    onClick={(e) => e.preventDefault()}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      followUnfollow(user._id)
+                    }}
                   >
-                    Follow
+                    {isPending ? <LoadingSpinner size={"sm"} />: "Follow"}
                   </button>
                
               </Link>
