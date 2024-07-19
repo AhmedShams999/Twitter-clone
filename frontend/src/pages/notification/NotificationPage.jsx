@@ -1,6 +1,9 @@
 import React, { useState } from 'react'
 import { Link } from "react-router-dom";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
+import { useMutation, useQueryClient,useQuery } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
+
 
 import { IoSettingsOutline } from "react-icons/io5";
 import { FaUser } from "react-icons/fa";
@@ -8,31 +11,52 @@ import { FaHeart } from "react-icons/fa6";
 
 
 function NotificationPage() {
-  const isLoading = false;
   const [showDropDown,setShowDropDown] = useState(false)
-	const notifications = [
-		{
-			_id: "1",
-			from: {
-				_id: "1",
-				username: "johndoe",
-				profileImg: "/avatars/boy2.png",
-			},
-			type: "follow",
-		},
-		{
-			_id: "2",
-			from: {
-				_id: "2",
-				username: "janedoe",
-				profileImg: "/avatars/girl1.png",
-			},
-			type: "like",
-		},
-	];
+	
+  const queryClient = useQueryClient()
+
+  const {data:notifications,isLoading} = useQuery({
+    queryKey: ["notifications"],
+    queryFn: async()=>{
+      try {
+        const res = await fetch("/api/notifications/")
+        const data = await res.json()
+
+        if(!res.ok) throw new Error(data.error || "Something went wrong!")
+
+        return data.reverse()
+        
+      } catch (error) {
+        throw new Error(error)
+      }
+    }
+  })
+
+  const {mutate:deleteAllNotifications,isPending} = useMutation({
+    mutationFn: async()=>{
+      try {
+        const res = await fetch("/api/notifications/",{
+          method: "DELETE",
+        })
+        const data = await res.json()
+        if(!res.ok) throw new Error(data.error || "Something went wrong!")
+
+      } catch (error) {
+        throw new Error(error)
+      }
+    },
+    onSuccess: ()=>{
+      toast.success("Notifications is deleted")
+      queryClient.invalidateQueries({queryKey:["notifications"]})
+    },
+    onError: ()=>{
+      toast.error(error.message)
+    }
+  })
 
 	const deleteNotifications = () => {
-		alert("All notifications deleted");
+    if(isPending) return
+    deleteAllNotifications()
 	};
 
   return (
@@ -57,7 +81,7 @@ function NotificationPage() {
           <LoadingSpinner size='lg' />
         </div>
       )}
-      {notifications?.length === 0 && <div className='text-center p-4 font-bold'>No notifications 🤔</div>}
+      {notifications?.length === 0 && <div className='notifications__empty'>No notifications 🤔</div>}
       {notifications?.map((notification) => (
         <div className='notifications__notification' key={notification._id}>
           <div className='notifications__notification__container'>

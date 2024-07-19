@@ -4,7 +4,7 @@ import { MdPassword } from 'react-icons/md';
 import XSvg from '../../../components/svgs/X';
 import { Link } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import toast from 'react-hot-toast';
+
 
 function LoginPage() {
   const [formData, setFormData] = useState({

@@ -4,6 +4,19 @@
   flex: 4 4 0;
   border-right: 1px solid gray;
   min-height: 100vh;
+
+  &__empty{
+    text-align: center;
+    color: white;
+    margin-top: 1rem;
+  }
+  &__loadingContainer{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 1rem;
+  }
   &__header{
     display: flex;
     justify-content: space-between;
