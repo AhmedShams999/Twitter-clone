@@ -9,7 +9,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
 import LoadingSpinner from "../common/LoadingSpinner.jsx"
-
+import {formatPostDate} from "../../utils/date/index.js"
 
 const Post = ({ post }) => {
 	const [comment, setComment] = useState("");
@@ -71,14 +71,48 @@ const Post = ({ post }) => {
 		}
 	})
 
+	const {mutate:commentPost,isPending:commentPending,error} = useMutation({
+		mutationFn: async()=>{
+			try {
+				const res = await  fetch(`/api/posts/comment/${post._id}`,{
+					method: "POST",
+					headers:{
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({text:comment})
+				})
+				const data = await res.json()
+
+				if(!res.ok) throw new Error(data.error || "Something went wrong!")
+				
+				return data
+
+			} catch (error) {
+				throw new Error(error)
+			}
+		},
+		onSuccess: (newCommentsInPost)=>{
+  		setComment("")
+			queryClient.setQueryData(["posts"],(oldData)=>{
+				return oldData.map(p => {
+					if(p._id === post._id){
+						return {...p,comments:newCommentsInPost.comments}
+					} else {
+						return p
+					}
+				})
+			})
+		},
+		onError: ()=>{
+			toast.error(error.message)
+		}
+	}) 
 	const postOwner = post.user;
 	const isLiked = post.likes.includes(authUser._id);
 
 	const isMyPost = authUser._id === postOwner._id;
 
-	const formattedDate = "1h";
-
-	const isCommenting = false;
+	const formattedDate = formatPostDate(post.createdAt);
 
 	const handleDeletePost = () => {
 		deletePost()
@@ -86,6 +120,8 @@ const Post = ({ post }) => {
 
 	const handlePostComment = (e) => {
 		e.preventDefault();
+		if(commentPending) return
+		commentPost(comment)
 	};
 
 	const handleLikePost = () => {
@@ -161,7 +197,7 @@ const Post = ({ post }) => {
 											
 												<div className='post__content__postInfo__firstPart__showComments__section__allComments__comment__userInfo'>
 													<div className='post__content__postInfo__firstPart__showComments__section__allComments__comment__userInfo__first'>
-														<span className='font-bold'>{comment.user.fullName}</span>
+														<span className='font-bold'>{comment.user.fullname}</span>
 														<span className='text-gray-700 text-sm'>
 															@{comment.user.username}
 														</span>
@@ -182,7 +218,7 @@ const Post = ({ post }) => {
 											onChange={(e) => setComment(e.target.value)}
 										/>
 										<button className='post__content__postInfo__firstPart__showComments__section__addComment__btn'>
-											{isCommenting ? (
+											{commentPending ? (
 												<LoadingSpinner size={"sm"} />
 											) : (
 												"Post"

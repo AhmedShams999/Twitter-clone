@@ -89,6 +89,7 @@ export const commentOnPost = async (req,res)=>{
 
     const post = await Post.findById(postId)
 
+
     if(!post) return res.status(404).json({error:"Post is not found"})
 
     const comment = {user:userId, text}
@@ -96,8 +97,17 @@ export const commentOnPost = async (req,res)=>{
     post.comments.push(comment)
 
     await post.save()
+    // const updatedComments = post.comments
+    const updatedPosts = await Post.findById(postId).populate({
+      path: "user",
+      select: "-password"
+    })
+    .populate({
+      path: "comments.user",
+      select: "-password"
+    })
 
-    res.status(200).json(post)
+    res.status(200).json(updatedPosts)
 
   } catch (error) {
     console.log("error in the commentOnPost func in post controller", error.message)

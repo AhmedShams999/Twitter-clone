@@ -116,6 +116,7 @@
               flex-direction: column;
               gap: 0.75rem;
               max-height: 15rem;
+              overflow-y: scroll;
               &__noComments{
                 font-weight: 300;
                 color: u.$slate;
@@ -126,6 +127,8 @@
                 align-items: start;
                 &__avatar{
                   width: 30px;
+                  height: 30px;
+                  border-radius: 50%;
                 }
                 &__userInfo{
                   display: flex;
