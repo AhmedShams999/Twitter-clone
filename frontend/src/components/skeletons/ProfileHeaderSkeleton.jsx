@@ -1,6 +1,6 @@
 const ProfileHeaderSkeleton = () => {
 	return (
-    <div class="skeleton-profile">
+    <div className="skeleton-profile">
 			 <div className="skeleton-profile__lineContainer">
        	<div className="skeleton-profile__lineContainer__line"></div>
        	<div className="skeleton-profile__lineContainer__line"></div>

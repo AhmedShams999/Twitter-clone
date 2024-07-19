@@ -1,5 +1,5 @@
-import { useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { Link, useParams } from "react-router-dom";
 
 import Posts from "../../components/common/Posts";
 import ProfileHeaderSkeleton from "../../components/skeletons/ProfileHeaderSkeleton";
@@ -11,29 +11,45 @@ import { FaArrowLeft } from "react-icons/fa6";
 import { IoCalendarOutline } from "react-icons/io5";
 import { FaLink } from "react-icons/fa";
 import { MdEdit } from "react-icons/md";
+import { useQuery } from "@tanstack/react-query";
+import { formatMemberSinceDate } from "../../utils/date";
 
 const ProfilePage = () => {
 	const [coverImg, setCoverImg] = useState(null);
 	const [profileImg, setProfileImg] = useState(null);
 	const [feedType, setFeedType] = useState("posts");
 
+	const {data:authUser} = useQuery({queryKey:["authUser"]})
+
 	const coverImgRef = useRef(null);
 	const profileImgRef = useRef(null);
 
-	const isLoading = false;
-	const isMyProfile = true;
+	const {username} = useParams()
 
-	const user = {
-		_id: "1",
-		fullName: "John Doe",
-		username: "johndoe",
-		profileImg: "/avatars/boy2.png",
-		coverImg: "/cover.png",
-		bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-		link: "https://youtube.com/@asaprogrammer_",
-		following: ["1", "2", "3"],
-		followers: ["1", "2", "3"],
-	};
+
+
+	
+
+
+  const {data:user,isLoading,refetch,isRefetching} = useQuery({
+		queryKey: ["userProfile"],
+		queryFn: async()=>{
+			try {
+				const res = await fetch(`/api/users/profie/${username}`)
+
+				const data = await res.json()
+
+				if(!res.ok) throw new Error(data.error || "Something went wrong!")
+
+				return data
+			} catch (error) {
+				throw new Error(error)
+			}
+		}
+	})
+
+	const joinedSinceDate = formatMemberSinceDate(user?.createdAt)
+	const isMyProfile = authUser?._id == user?._id;
 
 	const handleImgChange = (e, state) => {
 		const file = e.target.files[0];
@@ -47,14 +63,18 @@ const ProfilePage = () => {
 		}
 	};
 
+	useEffect(()=>{
+		refetch()
+	},[username,refetch])
+
 	return (
 		<>
 			<div className='profilePage'>
 				{/* HEADER */}
-				{isLoading && <ProfileHeaderSkeleton />}
-				{!isLoading && !user && <p className='text-center text-lg mt-4'>User not found</p>}
+				{(isLoading || isRefetching) && <ProfileHeaderSkeleton />}
+				{!isLoading && !isRefetching && !user && <p className='text-center text-lg mt-4'>User not found</p>}
 				<div className='profilePage__container'>
-					{!isLoading && user && (
+					{!isLoading && !isRefetching && user && (
 						<>
 							<div className='profilePage__container__header'>
 								<Link to='/' className="link">
@@ -131,7 +151,7 @@ const ProfilePage = () => {
 
 							<div className='profilePage__container__userInfo'>
 								<div className='profilePage__container__userInfo__firstPart'>
-									<span className='font-bold text-lg'>{user?.fullName}</span>
+									<span className='font-bold text-lg'>{user?.fullname}</span>
 									<span className='text-sm text-slate-500'>@{user?.username}</span>
 									<span className='text-sm my-1'>{user?.bio}</span>
 								</div>
@@ -154,12 +174,12 @@ const ProfilePage = () => {
 									)}
 									<div className='profilePage__container__userInfo__seconedPart__userJoinDate'>
 										<IoCalendarOutline className='profilePage__container__userInfo__seconedPart__userJoinDate__icon' />
-										<span>Joined July 2021</span>
+										<span>{joinedSinceDate}</span>
 									</div>
 								</div>
 								<div className='profilePage__container__userInfo__thirdPart'>
 									<div className='profilePage__container__userInfo__thirdPart__followersAndFollowing'>
-										<span>{user?.following.length}</span>
+										<span>{user?.followeing.length}</span>
 										<span>Following</span>
 									</div>
 									<div className='profilePage__container__userInfo__thirdPart__followersAndFollowing'>
@@ -191,7 +211,7 @@ const ProfilePage = () => {
 						</>
 					)}
 
-					<Posts />
+					<Posts feedType={feedType} username={username} userId={user?._id}/>
 				</div>
 			</div>
 		</>
