@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import useUpdate from "../../hooks/useUpdate";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
 
-const EditProfileModal = () => {
+const EditProfileModal = ({authUser}) => {
 	const [formData, setFormData] = useState({
-		fullName: "",
+		fullname: "",
 		username: "",
 		email: "",
 		bio: "",
@@ -11,9 +13,25 @@ const EditProfileModal = () => {
 		currentPassword: "",
 	});
 
+	const {updateProfile,updateProfilePending} = useUpdate()
+
 	const handleInputChange = (e) => {
 		setFormData({ ...formData, [e.target.name]: e.target.value });
 	};
+
+	useEffect(()=>{
+		if(authUser){
+			setFormData({
+				fullname: authUser.fullname,
+				username: authUser.username,
+				email: authUser.email,
+				bio: authUser.bio,
+				link: authUser.link,
+				newPassword: "",
+				currentPassword: "",
+			})
+		}
+	},[authUser])
 
 	return (
 		<>
@@ -30,15 +48,16 @@ const EditProfileModal = () => {
 						className='editContainer__updateData__form'
 						onSubmit={(e) => {
 							e.preventDefault();
-							alert("Profile updated successfully");
+							if(updateProfilePending) return
+							updateProfile(formData)
 						}}
 					>
 						<div className='editContainer__updateData__form__inputContainer'>
 							<input
 								type='text'
 								placeholder='Full Name'
-								value={formData.fullName}
-								name='fullName'
+								value={formData.fullname}
+								name='fullname'
 								onChange={handleInputChange}
 							/>
 							<input
@@ -88,7 +107,7 @@ const EditProfileModal = () => {
 							name='link'
 							onChange={handleInputChange}
 						/>
-						<button className='editContainer__updateData__form__btn'>Update</button>
+						<button className='editContainer__updateData__form__btn'>{updateProfilePending?<LoadingSpinner size={"sm"} />:"Update"}</button>
 					</form>
 				</div>
 				<form method='dialog' className='editContainer__closeBtn'>

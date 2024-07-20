@@ -27,7 +27,7 @@ function NotificationPage() {
         return data.reverse()
         
       } catch (error) {
-        throw new Error(error)
+        throw new Error(error.message)
       }
     }
   })
@@ -42,7 +42,7 @@ function NotificationPage() {
         if(!res.ok) throw new Error(data.error || "Something went wrong!")
 
       } catch (error) {
-        throw new Error(error)
+        throw new Error(error.message)
       }
     },
     onSuccess: ()=>{

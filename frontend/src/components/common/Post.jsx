@@ -27,7 +27,7 @@ const Post = ({ post }) => {
 				if(!res.ok) throw new Error (data.error || "Something went wrong!")
 				return data;
 			} catch (error) {
-				throw new Error(error)
+				throw new Error(error.message)
 			}
 		},
 		onSuccess: ()=>{
@@ -49,7 +49,7 @@ const Post = ({ post }) => {
 					return data
 
 				} catch (error) {
-					throw new Error(error)
+					throw new Error(error.message)
 				}
 		},
 		onSuccess: (updatedLikes)=>{
@@ -88,7 +88,7 @@ const Post = ({ post }) => {
 				return data
 
 			} catch (error) {
-				throw new Error(error)
+				throw new Error(error.message)
 			}
 		},
 		onSuccess: (newCommentsInPost)=>{
@@ -103,7 +103,7 @@ const Post = ({ post }) => {
 				})
 			})
 		},
-		onError: ()=>{
+		onError: (error)=>{
 			toast.error(error.message)
 		}
 	}) 

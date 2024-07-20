@@ -33,7 +33,7 @@ function Posts({feedType,username,userId}) {
         return data;
 
       } catch (error) {
-        throw new Error(error)
+        throw new Error(error.message)
       }
     }
   })

@@ -39,39 +39,46 @@
       flex-direction: column;
       gap: 1rem;
       margin-top: 20px;
-      & li{
+      & .link{
         display: flex;
-        justify-content: start;
-        padding: 10px 5px;
-        &:hover{
-          background-color: u.$secondary;
-        }
-        @include u.breackPoint(md){
-          justify-content: center;
-        }
-        & .link{
+        width: 100%;
+        & li{
+          width: 100%;
           display: flex;
-          gap: 10px;
+          justify-content: start;
           align-items: center;
+          padding: 10px 5px;
+          border-radius: 10px;
+          gap: 10px;
+          cursor: pointer;
           & .icon{
             width: 30px;
             height: 30px;
-          }
-      
-          & span{
-            @include u.breackPoint(md){
-              display: none;
+            & svg{
+              width: 15px;
             }
           }
-        }
-      }
-        & svg{
-          width: 15px;
+          &:hover{
+            background-color: u.$secondary;
+          }
+          @include u.breackPoint(md){
+            justify-content: center;
+          }
+        
+        
+            & span{
+              @include u.breackPoint(md){
+                display: none;
+              }
+            }
+          }
+          
         }
       
     }
     &__user-container{
       padding: 15px 10px; 
+      border-radius: 10px;
       &:hover{
         background-color: u.$secondary;
       }
@@ -87,6 +94,8 @@
         }
         &__profile-image{
           width: 50px;
+          height: 50px;
+          object-fit: cover;
           border-radius: 50%;
           // background-color: aqua;
         }

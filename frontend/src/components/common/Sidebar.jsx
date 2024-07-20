@@ -20,7 +20,7 @@ function Sidebar() {
         if(!res.ok) throw new Error(data.error || "Something went wrong!")
 
       } catch (error) {
-        throw new Error(error)
+        throw new Error(error.message)
       }
     
     },
@@ -40,24 +40,24 @@ function Sidebar() {
             <XSvg className='px-2 w-12 h-12 rounded-full fill-white hover:bg-stone-900' />
          </Link>
          <ul className='sidebar__container__list'>
-           <li>
             <Link to="/" className='link'>
-              <MdHomeFilled className='icon'/>
-              <span>Home</span> 
+              <li>
+                  <MdHomeFilled className='icon'/>
+                  <span>Home</span> 
+              </li>
             </Link>
-           </li>
-           <li>
             <Link to="/notifications" className='link'>
+           <li>
               <IoNotifications  className='icon' />
               <span>Notifications</span> 
-            </Link>
            </li>
-           <li>
+            </Link>
             <Link to={`/profile/${authUser.username}`} className='link'>
+           <li>
               <FaUser className='icon' />
               <span>Profile</span> 
-            </Link>
            </li>
+            </Link>
          </ul>
          {authUser && (
 					<Link

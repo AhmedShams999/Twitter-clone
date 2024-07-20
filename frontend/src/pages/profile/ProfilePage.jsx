@@ -11,13 +11,19 @@ import { FaArrowLeft } from "react-icons/fa6";
 import { IoCalendarOutline } from "react-icons/io5";
 import { FaLink } from "react-icons/fa";
 import { MdEdit } from "react-icons/md";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { formatMemberSinceDate } from "../../utils/date";
+import useFollow from "../../hooks/useFollow"
+import LoadingSpinner from "../../components/common/LoadingSpinner";
+import useUpdate from "../../hooks/useUpdate";
+
 
 const ProfilePage = () => {
 	const [coverImg, setCoverImg] = useState(null);
 	const [profileImg, setProfileImg] = useState(null);
 	const [feedType, setFeedType] = useState("posts");
+	
+	const queryClient = useQueryClient()
 
 	const {data:authUser} = useQuery({queryKey:["authUser"]})
 
@@ -25,11 +31,7 @@ const ProfilePage = () => {
 	const profileImgRef = useRef(null);
 
 	const {username} = useParams()
-
-
-
-	
-
+	const {followUnfollow,isPending} = useFollow()
 
   const {data:user,isLoading,refetch,isRefetching} = useQuery({
 		queryKey: ["userProfile"],
@@ -43,13 +45,16 @@ const ProfilePage = () => {
 
 				return data
 			} catch (error) {
-				throw new Error(error)
+				throw new Error(error.message)
 			}
 		}
 	})
 
+	const {updateProfile,updateProfilePending} = useUpdate()
+
 	const joinedSinceDate = formatMemberSinceDate(user?.createdAt)
-	const isMyProfile = authUser?._id == user?._id;
+	const isMyProfile = authUser?._id === user?._id;
+	const amIfollow = authUser?.followeing.includes(user?._id)
 
 	const handleImgChange = (e, state) => {
 		const file = e.target.files[0];
@@ -81,7 +86,7 @@ const ProfilePage = () => {
 									<FaArrowLeft className='w-4 h-4' />
 								</Link>
 								<div className='profilePage__container__header__info'>
-									<p className='font-bold text-lg'>{user?.fullName}</p>
+									<p className='font-bold text-lg'>{user?.fullname}</p>
 									<span className='text-sm text-slate-500'>{POSTS?.length} posts</span>
 								</div>
 							</div>
@@ -118,33 +123,45 @@ const ProfilePage = () => {
 										
 										<img src={profileImg || user?.profileImg || "/avatar-placeholder.png"} />
 										
-										<div className='profilePage__container__cover__userImage__editIcon'>
 											{isMyProfile && (
-												<MdEdit
-													className='w-4 h-4 text-white'
-													onClick={() => profileImgRef.current.click()}
-												/>
+													<div className='profilePage__container__cover__userImage__editIcon'>
+															<MdEdit
+																className='w-4 h-4 text-white'
+																onClick={() => profileImgRef.current.click()}
+															/>
+													</div>
 											)}
-										</div>
 								</div>
 							</div>
 							
 							<div className='profilePage__container__showBtns'>
-								{isMyProfile && <EditProfileModal />}
+								{isMyProfile && <EditProfileModal authUser={authUser} />}
 								{!isMyProfile && (
 									<button
 										className='profilePage__container__showBtns__followBtn'
-										onClick={() => alert("Followed successfully")}
+										onClick={() =>{
+											if(isPending) return ;
+											 followUnfollow(user?._id)
+											}}
 									>
-										Follow
+										{isPending && <LoadingSpinner size={"sm"} />}
+										{!isPending && amIfollow && "Unfollow"}
+										{!isPending && !amIfollow && "Follow"}
 									</button>
 								)}
 								{(coverImg || profileImg) && (
 									<button
 										className='profilePage__container__showBtns__updateBtn'
-										onClick={() => alert("Profile updated successfully")}
+										onClick={async () => {
+											if(updateProfilePending) return ;
+											// we use mutatAsync to can use await in the updateProfile function so we can set both coveImg and profileImg to null
+											await updateProfile({coverImg,profileImg})
+											setCoverImg(null)
+											setProfileImg(null)
+										}}
 									>
-										Update
+										{updateProfilePending ? <LoadingSpinner size={"sm"} /> : "Update"}
+
 									</button>
 								)}
 							</div>
