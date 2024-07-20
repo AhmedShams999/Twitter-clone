@@ -37,10 +37,10 @@ const env = process.env.NODE_ENV ? process.env.NODE_ENV.trim() : '';
 if (env === "production") {
   console.log('Entering production block');
   
-  app.use(express.static(path.join(__dirname, "/frontend/public")));
+  app.use(express.static(path.join(__dirname, "/frontend/dist")));
   
   app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "/frontend", "public", "index.html"));
+    res.sendFile(path.join(__dirname, "/frontend", "dist", "index.html"));
   });
   console.log('NODE_ENV:', env, '__dirname:', __dirname);
 } else {

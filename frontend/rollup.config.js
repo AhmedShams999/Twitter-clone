@@ -1,11 +1,16 @@
+import html from '@rollup/plugin-html';
 import postcss from 'rollup-plugin-postcss';
 
 export default {
-  // other Rollup config options
+  input: 'src/main.js', // Your main JS file
+  output: {
+    file: 'dist/bundle.js',
+    format: 'iife',
+  },
   plugins: [
-    postcss({
-      extract: true, // Extract CSS to a separate file
-      modules: true, // Enable CSS modules
+    postcss(),
+    html({
+      title: 'My App',
     }),
     // other plugins
   ],
