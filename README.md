@@ -48,5 +48,5 @@ This is a MERN project called Twitter clone built to demonstrate a basic social 
    npm run dev
 6. seconed run the frontend:
    ```bash
-   dc frontend
+   cd frontend
    npm run dev
