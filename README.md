@@ -34,13 +34,19 @@ This is a simple Twitter clone built to demonstrate a basic social media applica
 ## Getting Started
 
 ### Prerequisites
-
-- [Node.js](https://nodejs.org/) (for a Node.js-based project)
-- [Your Database (e.g., MongoDB, PostgreSQL)] installed and running
-
-### Installation
-
-1. Clone the repository:
+1. inatall all the dependencies (and intall the dependencies in frontend folder)
+2. Build the project (as a production mode):
    ```bash
-   git clone https://github.com/yourusername/twitter-clone.git
-   cd twitter-clone
+   npm run build
+3. Start the project:
+   ```bash
+   npm run start
+
+4. if you want to run the project as in development mode:
+5. first run the backend:
+   ```bash
+   npm run dev
+6. seconed run the frontend:
+   ```bash
+   dc frontend
+   npm run dev
