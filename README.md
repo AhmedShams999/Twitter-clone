@@ -47,7 +47,7 @@ This is a MERN project called Twitter clone built to demonstrate a basic social 
 
 ### Additional Tools
 - Authentication with JWT
-- Tailwind CSS
+- SCSS
 
 ## Getting Started
 
